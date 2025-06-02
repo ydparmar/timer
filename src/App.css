@@ -1,0 +1,139 @@
+* {
+    box-sizing: border-box;
+    position: relative;
+    font-family: "Roboto", sans-serif;
+    color: #fff9ed;
+    background-color: #295266;
+}
+
+#timer {
+    display: block;
+    font-size: 150px;
+    text-align: center;
+    margin: 50px;
+}
+
+.button {
+    border-radius: 100px;
+    border: none;
+    font-size: 60px;
+    cursor: pointer;
+}
+
+.button:hover {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.069) 0 0);
+}
+
+#startButton {
+    display: block;
+    background-color: #4795cce6;
+    width: 400px;
+    height: 100px;
+    margin: auto;
+    margin-top: 75px;
+}
+
+#stopButton {
+    background-color: #cc5247d9;
+    width: 300px;
+    height: 100px;
+    display: none;
+    left: 45px;
+}
+
+#finishButton {
+    background-color: #64b85cdb;
+    width: 300px;
+    height: 100px;
+    display: none;
+    left: 60px;
+}
+
+#input {
+    width: 600px;
+    height: 25px;
+    appearance: none;
+    border-radius: 50px;  
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.6;
+    margin: auto;
+    display: block;
+}
+
+#input::-webkit-slider-thumb {
+  appearance: none;
+  width: 40px; 
+  height: 40px;
+  border-radius: 50%; 
+  cursor: pointer;
+  background-color: #19b2ffe5;
+}
+
+#input::-webkit-slider-thumb:hover {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.069) 0 0);
+}
+
+#timerAndButtonsContainer {
+    width: 700px;
+    height: 500px;
+    margin: auto;
+}
+
+#progressBarSection {
+    width: 960px;
+    height: 400px;
+    background-color:#2e5f77f0;
+    margin: auto;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-color: #fff9ed2f transparent;
+    padding-top: 25px;
+}
+
+.progressBar {
+    background-color:#d3d3d3ec;
+    height: 40px;
+    border-radius: 40px;
+    margin-top: 10px;
+    display: inline-block
+}
+
+.progressBar:hover {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.069) 0 0);
+}
+
+.day {
+    display: block;
+    height: 55px;
+    background-color: transparent;
+}
+
+.day > * {
+    vertical-align:middle;
+}
+
+.date {
+    font-family: "Roboto mono", monospace;
+    padding-top: 10px;
+    display: inline-block;
+    background-color: transparent;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.time {
+  width: 80px;
+  height: 30px;
+  background-color: #2e2e33c9;
+  display: none;
+  margin: auto;
+  position: relative;
+  text-align: center;
+  top: -35px;
+  padding-top: 5px;
+}
+
+.progressBar:hover > :first-child {
+  display: block;
+}
