@@ -20,7 +20,7 @@ function App() {
       localStorage.clear()
     }
 
-    if (localStorage) {
+    if (localStorage.length) {
       // Setting up progressBarSection
       document.getElementById('progressBarSection').outerHTML = localStorage.getItem("progressBarSection");
 
