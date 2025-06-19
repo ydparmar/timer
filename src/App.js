@@ -26,7 +26,7 @@ function App() {
 
       // Setting up date
       if (document.getElementById("today") !== null) {
-        setToday((new Date()).getDate())
+        setToday(localStorage.getItem("today"))
       }
 
       // Setting up orignal slider value
@@ -211,9 +211,10 @@ function App() {
   // On closing/reloading tab
   window.addEventListener('beforeunload', () => {
     
-    // Saving progressBarSection and input value
+    // Saving progressBarSection and input value and day
     localStorage.setItem("progressBarSection", document.getElementById('progressBarSection').outerHTML);
     localStorage.setItem("inputValue", document.getElementById('input').value)
+    localStorage.setItem("today", today)
 
     // Setting current bar to red or green
     if (document.getElementById('currentBar') !== null) {
