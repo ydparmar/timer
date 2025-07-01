@@ -3,6 +3,9 @@
     position: relative;
     font-family: "Roboto", sans-serif;
     color: #fff9ed;
+}
+
+body {
     background-color: #295266;
 }
 
@@ -52,8 +55,16 @@
 #input {
     width: 600px;
     height: 25px;
-    appearance: none;
     border-radius: 50px;  
+}
+
+#input::-webkit-slider-thumb {
+  width: 40px; 
+  height: 40px;
+}
+
+.slider {
+    appearance: none;
     background: #d3d3d3;
     outline: none;
     opacity: 0.6;
@@ -61,7 +72,7 @@
     display: block;
 }
 
-#input::-webkit-slider-thumb {
+.slider::-webkit-slider-thumb {
   appearance: none;
   width: 40px; 
   height: 40px;
@@ -89,6 +100,7 @@
     white-space: nowrap;
     scrollbar-color: #fff9ed2f transparent;
     padding-top: 25px;
+    border-radius: 5px;
 }
 
 .progressBar {
@@ -136,4 +148,79 @@
 
 .progressBar:hover > :first-child {
   display: block;
+}
+
+#editBarScreen {
+    display: none;
+    width: 400px;
+    height: 230px;
+    background-color: rgb(49, 118, 153);
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+    padding-top: 10px;
+}
+
+#deleteButton {
+    border: none;
+    width: 300px;
+    height: 50px;
+    border-radius: 5px;
+    position: relative;
+    transform: translate(-50%, -50%);
+    margin-left: 50%;
+    top: 65px;
+    font-size: 20px;
+    background-color: #2d5265;
+}
+
+#exitButton {
+    border: none;
+    transform: translate(-50%, -50%);
+    display: inline;
+    top: 15px;
+    left: 375px;
+    background-color: transparent;
+    color: #a51d24;
+    font-size: 30px;
+    width: 40px;
+    height: 40px;
+}
+
+#editBarScreenHeader {
+    appearance: none;
+    background-color: transparent;
+    display: inline;
+    margin-left: 100px;
+}
+
+#barTime {
+    font-size: 20px;
+    position: relative;
+    display: block;
+    text-align: center;
+}
+
+#barTimeValue {
+    font-family: "Roboto mono", monospace;
+    font-weight: 500;
+}
+
+#barSlider {
+    position: relative;
+    margin: auto;
+    width: 225px;
+    height: 12.5px;
+    border-radius: 25px;
+    display: block;
+    margin-top: -5px;
+}
+
+#barSlider::-webkit-slider-thumb {
+  width: 20px; 
+  height: 20px;
+  border-radius: 50%; 
 }

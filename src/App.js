@@ -2,15 +2,86 @@ import React, { createElement } from 'react';
 import { useState, useEffect } from 'react';
 import './App.css';
 import HackTimer from 'hacktimer'
+import { isClickableInput } from '@testing-library/user-event/dist/utils';
+
+let clickedBar = null
+
 
 function App() {
 
   // Setting variables
   
   const [orignalSeconds, setOrignalSeconds] = useState(300)
+  const [duration, setDuration] = useState(0)
   const [timerState, setTimerState] = useState('off')
   const [today, setToday] = useState(null)
 
+  function getTimer(orignalSeconds) {
+      // Calculate hours, minutes, and seconds
+      let hoursInDecimal = orignalSeconds/3600
+      let hours = Math.floor(Math.round((hoursInDecimal * 10000)) / 10000)
+      let minutesInDecimal = (hoursInDecimal - hours) * 60
+      let minutes = Math.floor(Math.round((minutesInDecimal * 10000)) / 10000)
+      let seconds = Math.round((minutesInDecimal - minutes) * 60) 
+  
+      // Find out how much to display on timer and page title
+      if (orignalSeconds < 10) {
+        return seconds
+      } else if (orignalSeconds < 60) {
+        return String(seconds).padStart(2, '0')
+      } else if (orignalSeconds < 600) {
+        return `${minutes}:${String(seconds).padStart(2, '0')}`
+      } else if (orignalSeconds < 3600) {
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+      } else {
+        return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+      }
+    }
+
+    function openEditScreen() {
+      if (document.getElementById('editBarScreen').style.display === "block") {
+        return
+      }
+      clickedBar = this
+      document.getElementById('editBarScreen').style.display="block"
+      document.getElementById('barTimeValue').textContent= getTimer(clickedBar.dataset.time)
+      document.getElementById('barSlider').max=clickedBar.dataset.time
+      document.getElementById('barSlider').value=clickedBar.dataset.time
+
+      document.getElementById('deleteButton').addEventListener("click", handleDelete)
+      document.getElementById('barSlider').addEventListener("input", handleBarSizeChange)
+      document.getElementById('exitButton').addEventListener("click", handleExit)
+    }
+
+    function handleDelete() {
+      if (clickedBar.parentNode.childElementCount === 2) {
+        clickedBar.parentNode.remove()
+      } else {
+        clickedBar.remove()
+      }      
+      closeEditScreen()
+    }
+  
+    function handleBarSizeChange() {
+      document.getElementById('barTimeValue').textContent = getTimer(document.getElementById('barSlider').value)
+      clickedBar.dataset.time=document.getElementById('barSlider').value
+      clickedBar.style.width = String(Math.ceil(document.getElementById('barSlider').value/15)) + "px"
+    }
+
+    function handleExit() {
+      if (clickedBar.dataset.time === '0') {
+        document.getElementById('deleteButton').click()
+      } else {
+        closeEditScreen()
+      }
+    }
+
+    function closeEditScreen() {
+      document.getElementById('deleteButton').removeEventListener("click", handleDelete)
+      document.getElementById('barSlider').removeEventListener("input", handleBarSizeChange)
+      document.getElementById('exitButton').removeEventListener("click", handleExit)
+      document.getElementById('editBarScreen').style.display="none"
+    }
 
   useEffect(() => { // This useEffect only fires when the component renders for the first time
 
@@ -18,11 +89,17 @@ function App() {
     const clearLocalStorage = false
     if (clearLocalStorage) {
       localStorage.clear()
+      window.location.reload(true);
     }
 
-    if (localStorage.length) {
+    if (localStorage) {
       // Setting up progressBarSection
       document.getElementById('progressBarSection').outerHTML = localStorage.getItem("progressBarSection");
+      for (const day of document.getElementById('progressBarSection').children) {
+        for (let i = 1; i < day.children.length; i++) {
+          day.children[i].addEventListener("click", openEditScreen)
+        }
+      }
 
       // Setting up date
       if (document.getElementById("today") !== null) {
@@ -41,10 +118,10 @@ function App() {
   function checkForNewDay() {
 
     // Checking if it is a new day/user's first session
-    if (today !== (new Date()).getDate()) {
+    if (today !== (new Date()).toLocaleDateString() || document.getElementById('today') === null) {
 
       // Setting new date
-      setToday((new Date()).getDate())
+      setToday((new Date()).toLocaleDateString())
 
       // If it is not the user's first session then this removes the previous day's id as "today"
       if (document.getElementById('today')) {
@@ -73,27 +150,8 @@ function App() {
 
 
   useEffect(() => {
-
-    // Calculate hours, minutes, and seconds
-    let hoursInDecimal = orignalSeconds/3600
-    let hours = Math.floor(Math.round((hoursInDecimal * 10000)) / 10000)
-    let minutesInDecimal = (hoursInDecimal - hours) * 60
-    let minutes = Math.floor(Math.round((minutesInDecimal * 10000)) / 10000)
-    let seconds = Math.round((minutesInDecimal - minutes) * 60) 
-
-    // Find out how much to display on timer and page title
-    let timer // This is for managing scope
-    if (orignalSeconds < 10) {
-      timer = seconds
-    } else if (orignalSeconds < 60) {
-      timer = String(seconds).padStart(2, '0')
-    } else if (orignalSeconds < 600) {
-      timer = `${minutes}:${String(seconds).padStart(2, '0')}`
-    } else if (orignalSeconds < 3600) {
-      timer = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-    } else {
-      timer = `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-    }
+    
+    let timer = getTimer(orignalSeconds)
     document.getElementById('timer').textContent = timer
     document.title = timer
 
@@ -130,12 +188,13 @@ function App() {
       // Subtracting or adding 1 second
       const intervalId = setInterval(() => {
         timerState === 'down' ? setOrignalSeconds(prev => prev - 1) : setOrignalSeconds(prev => prev + 1)
+        setDuration(prev => prev + 1)
       }, 1000)
 
       // Adding 1 px to progress bar every 15 seconds
-      if (orignalSeconds % 15 === 0 && document.getElementById('currentBar') !== null) {
-        document.getElementById('currentBar').style.width = String(Number(document.getElementById('currentBar').offsetWidth) + 1) + "px"
-      }
+      document.getElementById('currentBar').style.width = String(Math.ceil(duration/15)) + "px"
+
+      document.getElementById('currentBar').dataset.time=duration
 
       // Removing interval
       return () => {
@@ -143,7 +202,6 @@ function App() {
       }
     }
   })
-
 
   function handleStartClick(CheckNewDay=true) {
 
@@ -156,6 +214,9 @@ function App() {
     newBar.className="progressBar"
     newBar.id="currentBar"
     document.getElementById('today').appendChild(newBar)
+    setTimeout(() => {
+      newBar.style.width = '1px'
+    }, 0);
 
     // Creating a tooltip showing when the bar was created
     const newTime = document.createElement('p')
@@ -194,18 +255,20 @@ function App() {
     
     // Setting progress bar color
     finished ? document.getElementById('currentBar').style.backgroundColor = '#64b85cdb' : document.getElementById('currentBar').style.backgroundColor = '#cc5247d9'
+    document.getElementById('currentBar').addEventListener("click", openEditScreen)
+    document.getElementById('currentBar').id = ''
     if (document.getElementById('pendingBar')) {
       finished ? document.getElementById('pendingBar').style.backgroundColor = '#64b85cdb' : document.getElementById('pendingBar').style.backgroundColor = '#cc5247d9'
+      document.getElementById('pendingBar').addEventListener("click", openEditScreen)
       document.getElementById('pendingBar').id = ''
     }
 
+
     // Resetting timer
-    setOrignalSeconds(document.getElementById('input').value)
-
-    // Removing id from currentBar
-    document.getElementById('currentBar').id = ''
-
     setTimerState('off')
+    setOrignalSeconds(document.getElementById('input').value)
+    setDuration(0)
+
   }
 
   // On closing/reloading tab
@@ -224,6 +287,10 @@ function App() {
       }
       document.getElementById('currentBar').id = ''
     }
+    
+    if (document.getElementById('editBarScreen').style.display === "block") {
+      handleExit()
+    }
   });
 
 
@@ -232,12 +299,18 @@ function App() {
     <>
       <div id="timerAndButtonsContainer">
         <p id="timer"></p>
-        <input id="input" type="range" min="300" max="7200" step="300" defaultValue="300" onChange={({ target }) => {setOrignalSeconds(target.value)}}></input>
+        <input className="slider" id="input" type="range" min="300" max="7200" step="300" defaultValue="300" onChange={({ target }) => {setOrignalSeconds(target.value)}}></input>
         <button id="startButton" className="button" onClick={handleStartClick}>Start</button>
         <button id="stopButton" className="button" onClick={() => {handleEndClick(false)}}>Stop</button>
         <button id="finishButton" className="button" onClick={() => {handleEndClick(true)}}>Finish</button>
       </div>
-      <div id="progressBarSection">
+      <div id="progressBarSection"></div>
+      <div id="editBarScreen">
+      <button id="exitButton" className='button'>✖</button>
+        <h1 id="editBarScreenHeader">Edit Bar</h1>
+        <p id="barTime">Duration: <span id="barTimeValue"></span></p>
+        <input id="barSlider" className="slider" type="range" min="0" max="500"></input>
+        <button id="deleteButton" className='button'>Delete</button>
       </div>
     </>
   )
